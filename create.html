@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+    <script src="http://code.jquery.com/jquery-1.11.3.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script src="jquery.ui.rotatable.js"></script>
+    <link rel="stylesheet" href="jquery.ui.rotatable.css">
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //map for storing info of dragged items
+            var mapForUniqueElement = new Object();
+            var mapForSameElement = new Object();
+            var x = null;
+            //Make element draggable
+            $(".drag").draggable({
+                helper: 'clone',
+                cursor: 'move',
+                tolerance: 'fit',
+                stack: '.drag',
+                revert: "invalid"
+            });
+            $("#droppable").droppable({
+                drop: function (e, ui) {
+                    var idOfDrag = $(ui.draggable)[0].id.split('-');
+                    if (mapForUniqueElement[idOfDrag[0]] != 1 && idOfDrag.length==1) {
+                        mapForUniqueElement[idOfDrag[0]]=1;
+                        //clone the element
+                        x = ui.helper.clone();
+                        /*Add a number to id so that if same element is dragged
+                        it can be differentiated using this number
+                        */
+                        var id = idOfDrag[0]+"-"+"1".toString();
+                        //set the map with number of same element in droppable area
+                        //initially it will be set to 1 when a new element is dragged
+                        mapForSameElement[idOfDrag[0]]=1;
+                        x.attr('id',id);
+                        //remove the cloned element
+                        ui.helper.remove();
+                        x.draggable({
+                            helper: 'original',
+                            containment: '#droppable',
+                            tolerance: 'fit',
+                            stack: '.drag'
+                        }).rotatable();
+                        x.resizable({
+                            animate: true,
+                            //aspectRatio: 16 / 9,
+                            helper: "ui-resizable-helper",
+                            handles: "n, e, s, w, nw, ne, sw,se"
+                        });
+                        x.appendTo('#droppable');
+                    }else if(mapForUniqueElement[idOfDrag[0]] == 1 && idOfDrag.length==1){
+                        x = ui.helper.clone();
+                        //increment the mapForSameElement by one
+                        mapForSameElement[idOfDrag]+=1;
+                        //add the number of same element to id
+                        var id = idOfDrag[0]+"-"+mapForSameElement[idOfDrag[0]].toString();
+                        x.attr('id',id);
+                        ui.helper.remove();
+                        x.draggable({
+                            helper: 'original',
+                            containment: '#droppable',
+                            tolerance: 'fit',
+                            stack: '.drag'
+                        }).rotatable();
+                        x.resizable({
+                            animate: true,
+                            //aspectRatio: 16 / 9,
+                            helper: "ui-resizable-helper",
+                            handles: "n, e, s, w, nw, ne, sw,se"
+                        });
+                        x.appendTo('#droppable');
+                    }
+                }
+            });
+        });
+        $(document).click(function(e) {
+            //first hide all functions
+            $("#droppable").find(".ui-resizable-handle").hide();
+            $("#tools").hide();
+            $("#droppable").find(".ui-rotatable-handle").hide();
+            // matches all children of droppable, change selector as needed
+            if( $(e.target).closest(".drag").length > 0 ) {
+                $(e.target).closest(".drag").find(".ui-resizable-handle").show();
+                $("#tools").show();
+                $(e.target).closest(".drag").find(".ui-rotatable-handle").show();
+                $('#toolId').val(e.target.parentNode.id);
+            }
+            else {
+                $("#droppable").find(".ui-resizable-handle").hide();
+                $("#tools").hide();
+                $("#droppable").find(".ui-rotatable-handle").hide();
+            }
+        });
+
+
+        $(function(){
+            $('#flip').click(function(e){
+                $("#"+$("#toolId")).toggleClass('flip');
+            });
+        });
+        $(function(){
+            $('#remove').click(function(e){
+                $("#"+$("#toolId").val()).remove();
+            });
+        });
+    </script>
+    <style>
+        .top {z-index: 2; position: relative}
+        .bottom {z-index: 1; position: relative}
+        .col{
+            float:left;
+            padding: 5px 5px 5px 5px;
+            margin: 5px 5px 5px 5px;
+        }
+        #col1{
+            width:500px;
+            height:820px;
+            border:1px solid #CCC;
+            float:left;
+        }
+
+        .drag{
+            width:100px;
+            height:100px;
+            position:relative;
+            background-size:contain !important;
+            background-repeat:no-repeat;
+            float:left;
+            margin-left:10px;
+            margin-top:30px;
+            border:solid 1px #CCC;
+        }
+        .drag:hover{
+            opacity: 0.6;
+            filter: alpha(opacity=40); /* For IE8 and earlier */
+        }
+        #droppable{
+            width:720px;
+            height :820px;
+            border:1px solid #CCC;
+        }
+        #droppable .drag{
+            width:200px;
+            height :220px;
+            background-size:200px;
+            border:none;
+        }
+        #droppable .drag img{
+            width:100%;
+            height:100%;
+            z-index:0;
+        }
+        .flip {
+            -moz-transform: scaleY(-1);
+            -o-transform: scaleY(-1);
+            -webkit-transform: scaleY(-1);
+            transform: scaleY(-1);
+            filter: FlipV;
+            -ms-filter: "FlipV";
+        }
+        .new-class{
+            width:200px;
+            height :220px;
+            background-size:200px;
+            border:solid 4px #666;
+        }
+        .ui-resizable-handle {
+            width: 10px;
+            height: 10px;
+            background-color: #ffffff;
+            border: 1px solid #000000;
+        }
+        .ui-resizable-n{
+            top: -10px;
+            left:50%;
+            width: 6px;
+            height: 6px;
+        }
+        .ui-resizable-e
+        {
+            right:-10px;
+            top:50%;
+            width: 6px;
+            height: 6px;
+        }
+        .ui-resizable-s
+        {
+            bottom: -10px;
+            left: 50%;
+            width:6px;
+            height: 6px;
+        }
+        .ui-resizable-w
+        {
+            left:-10px;
+            top:50%;
+            width: 6px;
+            height: 6px;
+        }
+        .ui-resizable-nw
+        {
+            left: -10px;
+            top: -10px;
+            width: 6px;
+            height: 6px;
+        }
+        .ui-resizable-ne
+        {
+            top: -10px;
+            right: -10px;
+            width: 6px;
+            height: 6px;
+        }
+        .ui-resizable-sw
+        {
+            bottom: -10px;
+            left: -10px;
+            width: 6px;
+            height: 6px;
+        }
+        .ui-resizable-se
+        {
+            bottom: -10px;
+            right: -10px;
+            width: 6px;
+            height: 6px;
+        }
+        .ui-resizable-helper {
+            border: 1px dotted #CCC;
+        }
+        .toolsTop{
+            background-color:#CCC;
+            opacity: 0.6;
+            filter: alpha(opacity=40);
+            width:70%;
+            height:50px;
+            float:right;
+            display:none;
+        }
+    </style>
+</head>
+<body>
+<div id="drag1" class="drag" style="background-position:center;">
+    <img class="img" height="50" width="50" src="images/icon.png" />
+</div>
+<div id="drag2" class="drag" style="background-position:center;">
+    <img class="img" height="50" width="50" src="images/bra.png" />
+</div>
+
+<div class="col" id="droppable">
+    <div class="toolsTop" id="tools">
+        <input id="toolId" type="hidden" value="hello">
+        <button id="flip" >Flip</button>
+        <button id="remove" >Remove</button>
+    </div>
+</div>
+</body>
+</html>
