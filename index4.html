@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type='text/javascript' src='jquery-1.6.4.js'></script>
+<link rel="stylesheet" href="jquery-ui.css">
+<script type='text/javascript' src='http://www.google.com/jsapi'></script>
+<script type='text/javascript' src='jquery-ui.js'></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var x = null;
+        //Make element draggable
+        $(".drag").draggable({
+            helper: 'clone',
+            cursor: 'move',
+            tolerance: 'fit',
+            stack: '.drag',
+            revert: "invalid"
+        });
+        $("#droppable").droppable({
+            drop: function (e, ui) {
+                if ($(ui.draggable)[0].id != "") {
+                    x = ui.helper.clone();
+                    ui.helper.remove();
+                    x.draggable({
+                        //helper: 'original',
+                        containment: '#droppable',
+                        tolerance: 'fit',
+                        stack: '.drag'
+                    });
+                    x.resizable({
+                        animate: true,
+                        //aspectRatio: 16 / 9,
+                        helper: "ui-resizable-helper",
+                        handles: "n, e, s, w, nw, ne, sw,se"
+                    });
+                    x.appendTo('#droppable');
+                }
+            }
+        });
+    });
+    $(document).click(function(e) {
+        // matches all children of droppable, change selector as needed
+        if( $(e.target).closest(".drag").length > 0 ) {
+            $(e.target).closest(".drag").find(".ui-resizable-handle").show();
+            $("#tools").show();
+        }
+        else {
+            $("#droppable").find(".ui-resizable-handle").hide();
+            $("#tools").hide();
+        }
+    });
+
+
+    $(function(){
+        $('#flip').click(function(e){
+            $('#droppable .img').addClass('drag2');
+        });
+    });
+    $(function(){
+        $('#rotate').click(function(e){
+            $('#droppable .img').addClass('rotate');
+        });
+    });
+</script>
+    <style>
+        .top {z-index: 2; position: relative}
+        .bottom {z-index: 1; position: relative}
+        .col{
+            float:left;
+            padding: 5px 5px 5px 5px;
+            margin: 5px 5px 5px 5px;
+        }
+        #col1{
+            width:500px;
+            height:820px;
+            border:1px solid #CCC;
+            float:left;
+        }
+
+        .drag{
+            width:100px;
+            height:100px;
+            position:relative;
+            background-size:contain !important;
+            background-repeat:no-repeat;
+            float:left;
+            margin-left:10px;
+            margin-top:30px;
+            border:solid 1px #CCC;
+        }
+        .drag:hover{
+            opacity: 0.6;
+            filter: alpha(opacity=40); /* For IE8 and earlier */
+        }
+        #droppable{
+            width:720px;
+            height :820px;
+            border:1px solid #CCC;
+        }
+        #droppable .drag{
+            width:200px;
+            height :220px;
+            background-size:200px;
+            border:none;
+        }
+        #droppable .drag img{
+            width:100%;
+            height:100%;
+            z-index:0;
+        }
+        .drag2 {
+            -moz-transform: scaleY(-1);
+            -o-transform: scaleY(-1);
+            -webkit-transform: scaleY(-1);
+            transform: scaleY(-1);
+            filter: FlipV;
+            -ms-filter: "FlipV";
+        }
+        .rotate{
+            transform:          rotate(270deg);
+            -ms-transform:      rotate(270deg);
+            -moz-transform:     rotate(270deg);
+            -webkit-transform:  rotate(270deg);
+            -o-transform:       rotate(270deg);
+        }
+        .new-class{
+            width:200px;
+            height :220px;
+            background-size:200px;
+            border:solid 4px #666;
+        }
+        .ui-resizable-handle {
+            width: 10px;
+            height: 10px;
+            background-color: #ffffff;
+            border: 1px solid #000000;
+        }
+        .ui-resizable-n{
+            top: -10px;
+            left:50%;
+            width: 6px;
+            height: 6px;
+        }
+        .ui-resizable-e
+        {
+            right:-10px;
+            top:50%;
+            width: 6px;
+            height: 6px;
+        }
+        .ui-resizable-s
+        {
+            bottom: -10px;
+            left: 50%;
+            width:6px;
+            height: 6px;
+        }
+
+        .ui-resizable-w
+        {
+            left:-10px;
+            top:50%;
+            width: 6px;
+            height: 6px;
+        }
+
+        .ui-resizable-nw
+        {
+            left: -10px;
+            top: -10px;
+            width: 6px;
+            height: 6px;
+        }
+        .ui-resizable-ne
+        {
+            top: -10px;
+            right: -10px;
+            width: 6px;
+            height: 6px;
+        }
+        .ui-resizable-sw
+        {
+            bottom: -10px;
+            left: -10px;
+            width: 6px;
+            height: 6px;
+        }
+        .ui-resizable-se
+        {
+            bottom: -10px;
+            right: -10px;
+            width: 6px;
+            height: 6px;
+        }
+        .ui-resizable-helper {
+            border: 1px dotted #CCC;
+        }
+        .toolsTop{
+            background-color:#CCC;
+            opacity: 0.6;
+            filter: alpha(opacity=40);
+            width:70%;
+            height:50px;
+            float:right;
+            display:none;
+        }
+    </style>
+</head>
+<body>
+<div id="drag1" class="drag" style="background-position:center;">
+    <img class="img" height="50" width="50" src="images/icon.png" />
+</div>
+
+<div class="col" id="droppable">
+    <div class="toolsTop" id="tools">
+        <button id="flip" >Flip</button>
+        <button id="rotate" >Rotate</button>
+    </div>
+</div>
+</body>
+</html>
